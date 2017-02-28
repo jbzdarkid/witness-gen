@@ -1,9 +1,17 @@
-// Provides the isValid(grid) method for validating a puzzle solution.
+// Provides the isValid() method for validating a puzzle solution.
 
 // Validates that the current grid state constitutes a solution.
-function isValid() {
+function isValid(grid, start, end, dots) {
   console.log('Validating grid')
   // Check that start and end are well defined, with the end on an edge and the start distinct from the end
+  if (end[0] != 0 && end[0] != grid.length-1 && end[1] != 0 && end[1] != grid[end[0]].length-1) {
+    console.log('End point not on an edge')
+    return false
+  }
+  if (start[0] == end[0] && start[1] == end[1]) {
+    console.log('Start and end points not distinct')
+    return false
+  }
 
   // Check that all corners are either unused (0) or traversed (2)
   // Except for the start and end, which must be half-used (1)
