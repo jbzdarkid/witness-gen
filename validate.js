@@ -1,90 +1,109 @@
 // Provides the isValid() method for validating a puzzle solution.
 
-// Validates that the current grid state constitutes a solution.
-function isValid(grid, start, end, dots) {
-  console.log('Validating grid')
+// Puzzle = {grid, start, end, dots}
+// Determines if the current grid state is solvable.
+// Returns 0 if the grid is potentially solvable, but not currently solved
+// Returns 1 if the grid is unsolvable
+// Returns 2 if the grid is solved
+function isValid(puzzle) {
+  console.log('Validating', puzzle)
   // Check that start and end are well defined, with the end on an edge and the start distinct from the end
-  if (end[0] != 0 && end[0] != grid.length-1 && end[1] != 0 && end[1] != grid[end[0]].length-1) {
-    console.log('End point not on an edge')
-    return false
+  if (puzzle.end.x != 0 && puzzle.end.x != puzzle.grid.length-1) {
+    if (puzzle.end.y != 0 && puzzle.end.y != puzzle.grid[puzzle.end.x].length-1) {
+      console.log('End point not on an edge')
+      return 1
+    }
   }
-  if (start[0] == end[0] && start[1] == end[1]) {
+  if (puzzle.start.x == puzzle.end.x && puzzle.start.y == puzzle.end.y) {
     console.log('Start and end points not distinct')
-    return false
+    return 1
   }
 
   // Check that all corners are either unused (0) or traversed (2)
   // Except for the start and end, which must be half-used (1)
-  for (var i=0; i<grid.length; i+=2) {
-    for (var j=0; j<grid[i].length; j+=2) {
-      if (i == start[0] && j == start[1]) {
-        if (grid[i][j] != 1) {
-          console.log('Start invalid')
-          return false
+  for (var x=0; x<puzzle.grid.length; x+=2) {
+    for (var y=0; y<puzzle.grid[x].length; y+=2) {
+      if (x == puzzle.start.x && y == puzzle.start.y) {
+        if (puzzle.grid[x][y] > 1) {
+          console.log('Start overfull')
+          return 1
+        } else if (puzzle.grid[x][y] == 0) {
+          console.log('Start underfull')
+          return 0
         }
-      } else if (i == end[0] && j == end[1]) {
-        if (grid[i][j] != 1) {
-          console.log('End invalid')
-          return false
+      } else if (x == puzzle.end.x && y == puzzle.end.y) {
+        if (puzzle.grid[x][y] > 1) {
+          console.log('End overfull')
+          return 1
+        } else if (puzzle.grid[x][y] == 0) {
+          console.log('End underfull')
+          return 0
         }
-      } else if (grid[i][j] != 0 && grid[i][j] != 2) {
-        console.log('Corner grid['+i+']['+j+'] invalid')
-        return false
+      } else if (puzzle.grid[x][y] > 2) {
+        console.log('Corner grid['+x+']['+y+'] overfull')
+        return 1
+      } else if (puzzle.grid[x][y] == 1) {
+        console.log('Corner grid['+x+']['+y+'] underfull')
+        return 0
       }
     }
   }
   // Check that all horizontal edges are unused (0) or traversed (1)
-  for (var i=0; i<grid.length; i+=2) {
-    for (var j=1; j<grid[i].length; j+=2) {
-      if (grid[i][j] != 0 && grid[i][j] != 1) {
-        console.log('Horizontal edge grid['+i+']['+j+'] invalid')
-        return false
+  for (var x=0; x<puzzle.grid.length; x+=2) {
+    for (var y=1; y<puzzle.grid[x].length; y+=2) {
+      if (puzzle.grid[x][y] > 1) {
+        console.log('Horizontal edge grid['+x+']['+y+'] overfull')
+        return 1
       }
     }
   }
   // Check that all vertical edges are unused (0) or traversed (1)
-  for (var i=1; i<grid.length; i+=2) {
-    for (var j=2; j<grid[i].length; j+=2) {
-      if (grid[i][j] != 0 && grid[i][j] != 1) {
-        console.log('Vertical edge grid['+i+']['+j+'] invalid')
-        return false
+  for (var x=1; x<puzzle.grid.length; x+=2) {
+    for (var y=0; y<puzzle.grid[x].length; y+=2) {
+      if (puzzle.grid[x][y] > 1) {
+        console.log('Vertical edge grid['+x+']['+y+'] overfull')
+        return 1
       }
     }
   }
   // Check that all dots are covered
   // FIXME: I'm not currently checking for invalid dot placements.
-  for (var i=0; i<dots.length; i++) {
-    if (grid[dots[i][0]][dots[i][1]] == 0) {
-      console.log('Dot at grid['+dots[i][0]+']['+dots[i][1]+'] is not covered')
-      return false
+  for (let dot of puzzle.dots) {
+    if (puzzle.grid[dot.x][dot.y] == 0) {
+      console.log('Dot at grid['+dot.x+']['+dot.y+'] is not covered')
+      return 0
     }
   }
   // Check that individual regions are valid
-  regions = _getRegions(grid)
-  for (var i=0; i<regions.length; i++) {
-    if (!_regionCheck(grid, regions[i])) {
-      console.log("Failed for region "+i)
-      return false
+  regions = _getRegions(puzzle.grid)
+  for (let region of regions) {
+    var ret = _regionCheck(puzzle.grid, region)
+    if (ret == 0) {
+      console.log('Region', region, 'incomplete')
+      return 0
+    } else if (ret == 1) {
+      console.log('Region', region, 'unsolvable')
+      return 1
     }
   }
   // All checks passed
   console.log('Grid valid')
-  return true
+  return 2
 }
 
-// Returns the contiguous regions on the grid. This is sized to the base grid
-// because it only refers to the cells, not the corners or edges.
+// Returns the contiguous regions on the grid, as arrays of points.
+// The return array may contain empty cells.
 function _getRegions(grid) {
   var colors = []
-  for (var i=0; i<grid.length; i++) {
-    colors[i] = []
-    for (var j=0; j<grid[i].length; j++) {
-      colors[i][j] = 0
+  for (var x=0; x<grid.length; x++) {
+    colors[x] = []
+    for (var y=0; y<grid[x].length; y++) {
+      colors[x][y] = 0
     }
   }
 
   var regions = []
-  var unvisited = [[1, 1]]
+  var unvisited = [{'x':1, 'y':1}]
   var localRegion = []
 
   while (unvisited.length > 0) {
@@ -92,39 +111,38 @@ function _getRegions(grid) {
     localRegion.push(unvisited.pop())
     while (localRegion.length > 0) {
       var cell = localRegion.pop()
-      if (colors[cell[0]][cell[1]] != 0) {
+      if (colors[cell.x][cell.y] != 0) {
         continue
       } else {
-        colors[cell[0]][cell[1]] = regions.length
+        colors[cell.x][cell.y] = regions.length
         regions[regions.length-1].push(cell)
       }
-      if (cell[0] < colors.length-2 && colors[cell[0]+2][cell[1]] == 0) {
-        if (grid[cell[0]+1][cell[1]] == 0) {
-          localRegion.push([cell[0]+2, cell[1]])
+      if (cell.x < colors.length-2 && colors[cell.x+2][cell.y] == 0) {
+        if (grid[cell.x+1][cell.y] == 0) {
+          localRegion.push({'x':cell.x+2, 'y':cell.y})
         } else {
-          unvisited.push([cell[0]+2, cell[1]])
+          unvisited.push({'x':cell.x+2, 'y':cell.y})
         }
       }
-      if (colors[cell[0]][cell[1]+2] == 0) {
-      // if (cell[1] < colors[cell[0]].length-2 && colors[cell[0]][cell[1]+2] == 0) {
-        if (grid[cell[0]][cell[1]+1] == 0) {
-          localRegion.push([cell[0], cell[1]+2])
+      if (cell.y < colors[cell.x].length-2 && colors[cell.x][cell.y+2] == 0) {
+        if (grid[cell.x][cell.y+1] == 0) {
+          localRegion.push({'x':cell.x, 'y':cell.y+2})
         } else {
-          unvisited.push([cell[0], cell[1]+2])
+          unvisited.push({'x':cell.x, 'y':cell.y+2})
         }
       }
-      if (cell[0] > 1 && colors[cell[0]-2][cell[1]] == 0) {
-        if (grid[cell[0]-1][cell[1]] == 0) {
-          localRegion.push([cell[0]-2, cell[1]])
+      if (cell.x > 1 && colors[cell.x-2][cell.y] == 0) {
+        if (grid[cell.x-1][cell.y] == 0) {
+          localRegion.push({'x':cell.x-2, 'y':cell.y})
         } else {
-          unvisited.push([cell[0]-2, cell[1]])
+          unvisited.push({'x':cell.x-2, 'y':cell.y})
         }
       }
-      if (cell[1] > 1 && colors[cell[0]][cell[1]-2] == 0) {
-        if (grid[cell[0]][cell[1]-1] == 0) {
-          localRegion.push([cell[0], cell[1]-2])
+      if (cell.y > 1 && colors[cell.x][cell.y-2] == 0) {
+        if (grid[cell.x][cell.y-1] == 0) {
+          localRegion.push({'x':cell.x, 'y':cell.y-2})
         } else {
-          unvisited.push([cell[0], cell[1]-2])
+          unvisited.push({'x':cell.x, 'y':cell.y-2})
         }
       }
     }
@@ -136,24 +154,27 @@ function _getRegions(grid) {
 }
 
 // Checks if a region (series of cells) is valid.
+// Matches the return style of isValid. In this case, a return value of 1
+// means that adding more lines (subdividing the region) cannot solve
 // FIXME: Ideally, this encapsulates to not need to know about the grid.
+//      : At present, I'm keeping the cell locations to prepare for tetros
 function _regionCheck(grid, region) {
   // Check that squares are separated
   var squares = {}
-  for (var i=0; i<region.length; i++) {
-    var cell = grid[region[i][0]][region[i][1]]
+  for (var pos of region) {
+    var cell = grid[pos.x][pos.y]
     if (cell != 0) {
-      if (cell['type'] == 'square') {
-        if (squares[cell['color']] === undefined) {
-          squares[cell['color']] = 0
+      if (cell.type == 'square') {
+        if (squares[cell.color] === undefined) {
+          squares[cell.color] = 0
         }
-        squares[cell['color']]++
+        squares[cell.color]++
       }
     }
   }
   if (Object.keys(squares).length > 1) {
     console.log('Region has squares of different colors', squares)
-    return false
+    return 0
   }
-  return true
+  return 2
 }
