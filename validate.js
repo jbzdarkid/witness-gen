@@ -69,8 +69,6 @@ function isValid(puzzle) {
   // Check that all dots are covered
   // FIXME: I'm not currently checking for invalid dot placements.
   for (var dot of puzzle.dots) {
-    console.log(dot)
-    console.log(puzzle)
     if (puzzle.grid[dot.x][dot.y] == 0) {
       console.log('Dot at grid['+dot.x+']['+dot.y+'] is not covered')
       return 0

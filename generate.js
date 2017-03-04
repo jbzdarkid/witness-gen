@@ -26,7 +26,7 @@ function _copy(puzzle) {
     'grid':new_grid,
     'start':{'x':puzzle.start.x, 'y':puzzle.start.y},
     'end':{'x':puzzle.end.x, 'y':puzzle.end.y},
-    'dots':puzzle.dots.slice(),
+    'dots':puzzle.dots.slice()
   }
 }
 
@@ -46,17 +46,19 @@ function _randomize(width, height) {
 
   // Dots must be on edges or corners
   var dots = []
-  // for (var i=0; i<_randint(width); i++) {
-  //   if (_randint(2) == 0) {
-  //     dots.push({'x':2*_randint(width/2)+1, 'y':2*_randint(height/2)})
-  //   } else {
-  //     dots.push({'x':2*_randint(width/2), 'y':2*_randint(height/2)+1})
-  //   }
-  // }
+  var numDots = _randint(width)
+  for (var i=0; i<numDots; i++) {
+    var x = _randint(width)
+    if (x%2 == 0) {
+      dots.push({'x':x, 'y':_randint(height)})
+    } else {
+      dots.push({'x':x, 'y':2*_randint(width/2)})
+    }
+  }
 
   for (var x=1; x<width; x+=2) {
     for (var y=1; y<height; y+=2) {
-      if (_randint(100) > 90) { // 90% empty space
+      if (_randint(100) > 50) { // 90% empty space
         var color = ['white', 'black'][Math.floor(Math.random()*2)]
         grid[x][y] = {'type':'square', 'color':color}
       }
@@ -68,13 +70,7 @@ function _randomize(width, height) {
 var solutions = []
 // Generates a solution via recursive backtracking
 function _solve(puzzle, pos) {
-  limit--
-  if (limit < 0) return
-  console.log("grid:")
-  console.log(""+puzzle.grid[0])
-  console.log(""+puzzle.grid[1])
-  console.log(""+puzzle.grid[2])
-  console.log("pos: "+pos.x+" "+pos.y)
+  if (solutions.length > 0) return
   var ret = isValid(puzzle)
   if (ret == 0) { // Solution still possible, recurse
     if (pos.x < puzzle.grid.length-1 && puzzle.grid[pos.x+2][pos.y] == 0) {
@@ -105,11 +101,7 @@ function _solve(puzzle, pos) {
       new_puzzle.grid[pos.x][pos.y-2]++
       _solve(new_puzzle, {'x':pos.x, 'y':pos.y-2})
     }
-  } else if (ret == 1) { // No solution possible, backtrack
-    console.log('Solution impossible')
-    return
-  } else if (ret == 2) {
-    console.log('Solution valid')
+  } else if (ret == 2) { // Solution found
     solutions.push(puzzle)
     return
   }
@@ -119,16 +111,13 @@ function generatePuzzle(width, height) {
   solutions = []
   while (true) {
     var puzzle = _randomize(width, height)
-    console.log(puzzle)
     _solve(puzzle, puzzle.start)
     if (solutions.length == 0) {
-      continue // No solutions, generate another
+      continue
     } else if (solutions.length == 1) {
-      break
-      // return puzzle // Unique solution, valid puzzle
+      break // Unique solution, valid puzzle
     } else {
-      break
-      // Computer differences of solutions, and force only one via dots
+      break // Multiple solutions, force only one via dots & breaks
     }
   }
   draw(solutions[0])
