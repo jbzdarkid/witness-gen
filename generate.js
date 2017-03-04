@@ -67,51 +67,12 @@ function _randomize(width, height) {
   return {'grid':grid, 'start':start, 'end':end, 'dots':dots}
 }
 
-var solutions = []
-// Generates a solution via recursive backtracking
-function _solve(puzzle, pos) {
-  if (solutions.length > 0) return
-  var ret = isValid(puzzle)
-  if (ret == 0) { // Solution still possible, recurse
-    if (pos.x < puzzle.grid.length-1 && puzzle.grid[pos.x+2][pos.y] == 0) {
-      var new_puzzle = _copy(puzzle)
-      new_puzzle.grid[pos.x+0][pos.y]++
-      new_puzzle.grid[pos.x+1][pos.y]++
-      new_puzzle.grid[pos.x+2][pos.y]++
-      _solve(new_puzzle, {'x':pos.x+2, 'y':pos.y})
-    }
-    if (pos.y < puzzle.grid[pos.x].length-1 && puzzle.grid[pos.x][pos.y+2] == 0) {
-      var new_puzzle = _copy(puzzle)
-      new_puzzle.grid[pos.x][pos.y+0]++
-      new_puzzle.grid[pos.x][pos.y+1]++
-      new_puzzle.grid[pos.x][pos.y+2]++
-      _solve(new_puzzle, {'x':pos.x, 'y':pos.y+2})
-    }
-    if (pos.x > 0 && puzzle.grid[pos.x-2][pos.y] == 0) {
-      var new_puzzle = _copy(puzzle)
-      new_puzzle.grid[pos.x-0][pos.y]++
-      new_puzzle.grid[pos.x-1][pos.y]++
-      new_puzzle.grid[pos.x-2][pos.y]++
-      _solve(puzzle, {'x':pos.x-2, 'y':pos.y})
-    }
-    if (pos.y > 0 && puzzle.grid[pos.x][pos.y-2] == 0) {
-      var new_puzzle = _copy(puzzle)
-      new_puzzle.grid[pos.x][pos.y-0]++
-      new_puzzle.grid[pos.x][pos.y-1]++
-      new_puzzle.grid[pos.x][pos.y-2]++
-      _solve(new_puzzle, {'x':pos.x, 'y':pos.y-2})
-    }
-  } else if (ret == 2) { // Solution found
-    solutions.push(puzzle)
-    return
-  }
-}
-
 function generatePuzzle(width, height) {
-  solutions = []
+  var solutions;
   while (true) {
+    solutions = []
     var puzzle = _randomize(width, height)
-    _solve(puzzle, puzzle.start)
+    solve(puzzle, puzzle.start, solutions)
     if (solutions.length == 0) {
       continue
     } else if (solutions.length == 1) {
