@@ -42,7 +42,25 @@ function _randomize(width, height) {
 
   // Both start and end must be on corners
   var start = {'x':2*_randint(width/2), 'y':2*_randint(height/2)}
-  var end = {'x':2*_randint(width/2), 'y':2*_randint(height/2)}
+  var end = {}
+  switch (_randint(4)) {
+    case 0:
+      end.x = 0
+      end.y = 2*_randint(height/2)
+      break;
+    case 1:
+      end.x = 2*_randint(height/2)
+      end.y = 0
+      break;
+    case 2:
+      end.x = width-1
+      end.y = 2*_randint(height/2)
+      break;
+    case 3:
+      end.x = 2*_randint(height/2)
+      end.y = height-1
+      break;
+  }
 
   // Dots must be on edges or corners
   var dots = []
