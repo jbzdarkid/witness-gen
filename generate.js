@@ -64,7 +64,7 @@ function _randomize(width, height) {
 
   // Dots must be on edges or corners
   var dots = []
-  var numDots = _randint(width)
+  var numDots = _randint(width/2)
   for (var i=0; i<numDots; i++) {
     var x = _randint(width)
     if (x%2 == 0) {
@@ -76,21 +76,22 @@ function _randomize(width, height) {
 
   for (var x=1; x<width; x+=2) {
     for (var y=1; y<height; y+=2) {
-      if (_randint(100) > 50) { // 90% empty space
-        var color = ['white', 'black'][Math.floor(Math.random()*2)]
+      if (_randint(100) > 70) { // 70% empty space
+        var color = ['red', 'blue', 'green', 'orange'][Math.floor(Math.random()*2)]
         grid[x][y] = {'type':'square', 'color':color}
       }
     }
   }
+  grid[1][1] = {'type':'poly', 'shape':'2.0.0'}
   return {'grid':grid, 'start':start, 'end':end, 'dots':dots}
 }
 
 function generatePuzzle(width, height) {
-  var solutions;
+  var solutions
   while (true) {
     solutions = []
     var puzzle = _randomize(width, height)
-    solve(puzzle, puzzle.start, solutions)
+    solve(puzzle, puzzle.start, solutions, [false])
     if (solutions.length == 0) {
       continue
     } else if (solutions.length == 1) {
