@@ -1,3 +1,17 @@
+// Returns a new copy of a puzzle, since javascript is pass-by-reference.
+function _copy(puzzle) {
+  var new_grid = []
+  for (var x=0; x<puzzle.grid.length; x++) {
+    new_grid[x] = puzzle.grid[x].slice()
+  }
+  return {
+    'grid':new_grid,
+    'start':{'x':puzzle.start.x, 'y':puzzle.start.y},
+    'end':{'x':puzzle.end.x, 'y':puzzle.end.y},
+    'dots':puzzle.dots.slice()
+  }
+}
+
 // Generates a solution via recursive backtracking
 function solve(puzzle, pos, solutions, hasSolution) {
   if (hasSolution[0]) return
