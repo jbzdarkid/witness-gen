@@ -153,7 +153,7 @@ function _getRegions(grid) {
 // Checks if a region (series of cells) is valid.
 // Since the path must be complete at this point, returns only true or false
 function _regionCheck(grid, region) {
-  // Check that squares are separated
+  // Count elements
   var squares = {}
   var polys = []
   for (var pos of region) {
