@@ -78,11 +78,7 @@ function isValid(puzzle) {
   // Check that individual regions are valid
   regions = _getRegions(puzzle.grid)
   for (var region of regions) {
-    var ret = _regionCheck(puzzle.grid, region)
-    if (ret == 0) {
-      // console.log('Region', region, 'incomplete')
-      return 0
-    } else if (ret == 1) {
+    if (!_regionCheck(puzzle.grid, region)) {
       console.log('Region', region, 'unsolvable')
       return 1
     }
@@ -155,8 +151,7 @@ function _getRegions(grid) {
 }
 
 // Checks if a region (series of cells) is valid.
-// Matches the return style of isValid. In this case, a return value of 1
-// means that adding more lines (subdividing the region) cannot solve
+// Since the path must be complete at this point, returns only true or false
 function _regionCheck(grid, region) {
   // Check that squares are separated
   var squares = {}
@@ -176,9 +171,9 @@ function _regionCheck(grid, region) {
   }
   if (Object.keys(squares).length > 1) {
     console.log('Region has squares of different colors', squares)
-    return 0
+    return false
   }
-  var first = {'x':grid.length, 'y':grid[grid.length-1].length}
+  var first = {'x':grid.length-1, 'y':grid[grid.length-1].length}
   var new_grid = []
   for (var x=0; x<grid.length; x++) {
     new_grid[x] = []
@@ -191,9 +186,9 @@ function _regionCheck(grid, region) {
   }
   if (_polyFit(polys, new_grid, first, [false]) == 1) {
     console.log('Region does not match polyomino shapes', polys)
-    return 1
+    return false
   }
-  return 2
+  return true
 }
 
 var POLY_DICT = {
