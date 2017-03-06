@@ -1,5 +1,5 @@
-function draw(puzzle) {
-  var table = document.getElementById('puzzle')
+function draw(puzzle, target='puzzle') {
+  var table = document.getElementById(target)
   while (table.rows.length > 0) {
     table.deleteRow(0)
   }
@@ -25,7 +25,7 @@ function draw(puzzle) {
         cell.style.borderBottomRightRadius = '10px'
       }
       cell.align = 'center'
-      cell.id = x+'_'+y
+      cell.id = target+'_'+x+'_'+y
 
       var div = document.createElement('div')
       div.align = 'center'
@@ -96,7 +96,7 @@ function draw(puzzle) {
     }
   }
   for (var dot of puzzle.dots) {
-    var cell = document.getElementById(dot.x+'_'+dot.y)
+    var cell = document.getElementById(target+'_'+dot.x+'_'+dot.y)
     var div = cell.childNodes[0]
     div.innerHTML = '\u2b22'
     div.style.fontSize = '16px'

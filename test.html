@@ -1,0 +1,47 @@
+<html>
+  <head>
+    <style>
+      @font-face {
+        font-family: Constantia;
+        src: url('Constantia.ttf');
+      }
+      * {font-family: Constantia}
+      html, body {width: 100%}
+      table {
+        position: relative;
+        top: 10%;
+        margin: auto;
+      }
+    </style>
+    <link rel="stylesheet" type="text/css" href="style1.css" id="stylesheet">
+    <!-- document.getElementById("stylesheet").href = 'style2.css' -->
+    <title>Random puzzles or something</title>
+  </head>
+  <body>
+
+  <script type="text/javascript" src="test.js"></script>
+  <script type="text/javascript" src="validate.js"></script>
+  <script type="text/javascript" src="solve.js"></script>
+  <script type="text/javascript" src="display.js"></script>
+  <div style="text-align: center; font-size: 30">The Witness</div>
+  <div style="text-align: center; font-size: 20">puzzle tests</div>
+  <div style="text-align: center;">
+    <button onclick="generatePuzzle()">Load tests</button>
+  </div>
+
+  <table id="meta" cellpadding="20">
+    <tr>
+      <td><table id="test0" cellspacing="0" cellpadding="0"></table></td>
+      <td><table id="test1" cellspacing="0" cellpadding="0"></table></td>
+      <td><table id="test2" cellspacing="0" cellpadding="0"></table></td>
+      <td><table id="test3" cellspacing="0" cellpadding="0"></table></td>
+    </tr><tr>
+      <td><table id="test4" cellspacing="0" cellpadding="0"></table></td>
+      <td><table id="test5" cellspacing="0" cellpadding="0"></table></td>
+      <td><table id="test6" cellspacing="0" cellpadding="0"></table></td>
+      <td><table id="test7" cellspacing="0" cellpadding="0"></table></td>
+    </tr>
+  </table>
+
+  </body>
+</html>
