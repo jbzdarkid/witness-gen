@@ -57,7 +57,11 @@ function test4() {
 
 function generatePuzzle() {
   for (var i=0; i<8; i++) {
-    var puzzle = eval('test'+i+'()')
+    try {
+      var puzzle = eval('test'+i+'()')
+    } catch (e) {
+      continue
+    }
     var solutions = []
     solve(puzzle, puzzle.start, solutions, [false])
     draw(solutions[0], 'test'+i)
