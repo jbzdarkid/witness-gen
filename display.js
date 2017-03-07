@@ -91,6 +91,10 @@ function draw(puzzle, target='puzzle') {
         // FIXME: Real polyominos, somehow
         div.innerHTML = puzzle.grid[x][y].shape
         div.style.color = 'white'
+      } else if (puzzle.grid[x][y].type == 'nega') {
+        div.innerHTML = '\u2144'
+        div.style.color = puzzle.grid[x][y].color
+        div.style.fontSize = '24px'
       }
       cell.appendChild(div)
     }

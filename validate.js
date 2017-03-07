@@ -150,9 +150,117 @@ function _getRegions(grid) {
   return regions
 }
 
+function _combinations(grid, region) {
+  var nega = 0
+  for (var i=0; i<region.length; i++) {
+    var pos = region[i]
+    var cell = grid[pos.x][pos.y]
+    if (cell != 0) {
+      if (cell.type == 'nega') {
+        nega = {'x':pos.x, 'y':pos.y, 'cell':cell, 'i':i}
+        break
+      }
+    }
+  }
+  if (nega == 0) {
+    return [[]]
+  } else {
+    region.splice(nega.i, 1)
+    grid[nega.x][nega.y] = 0
+    var combinations = []
+    // For each element in the region
+    for (var i=0; i<region.length; i++) {
+      var pos = region[i]
+      var cell = grid[pos.x][pos.y]
+      if (cell != 0) {
+        // Negate the item
+        grid[pos.x][pos.y] = 0
+        // Find all combinations of later items
+        var new_region = region.slice()
+        new_region.splice(i, 1)
+        for (var comb of _combinations(grid, new_region)) {
+          // Combine this negation with each later combination
+          combinations.push([{
+            'source':{'x':nega.x, 'y':nega.y, 'cell':nega.cell},
+            'target':{'x':pos.x, 'y':pos.y, 'cell':cell}
+          }].concat(comb))
+        }
+        // Undo the negation
+        grid[pos.x][pos.y] = cell
+      }
+    }
+    // Restore the negation element too
+    region.splice(nega.i, 0, {'x':nega.x, 'y':nega.y})
+    grid[nega.x][nega.y] = nega.cell
+    return combinations
+  }
+}
+
+// Makes a copy of the grid, since javascript is pass-by-reference
+function _copyGrid(grid) {
+  var new_grid = []
+  for (var row of grid) {
+    new_grid.push(row.slice())
+  }
+  return new_grid
+}
+
 // Checks if a region (series of cells) is valid.
 // Since the path must be complete at this point, returns only true or false
 function _regionCheck(grid, region) {
+  var hasNega = false
+  for (var i=0; i<region.length; i++) {
+    var pos = region[i]
+    var cell = grid[pos.x][pos.y]
+    if (cell != 0 && cell.type == 'nega') {
+      hasNega = true
+      break
+    }
+  }
+  if (hasNega) {
+    // Get all possible ways of applying negations, and set a label to easily move on to the next one.
+    var combinations = _combinations(grid, region)
+    nextCombination: for (var combination of combinations) {
+      // Make a copy of the grid and region with negation elements removed
+      var new_grid = _copyGrid(grid)
+      var new_region = region.slice()
+      for (var negation of combination) {
+        new_grid[negation.source.x][negation.source.y] = 0
+        new_grid[negation.target.x][negation.target.y] = 0
+        for (var i=0; i<new_region.length; i++) {
+          if (new_region[i].x == negation.source.x &&
+              new_region[i].y == negation.source.y) {
+            new_region.splice(i, 1)
+            i--
+          } else if (new_region[i].x == negation.target.x &&
+              new_region[i].y == negation.target.y) {
+            new_region.splice(i, 1)
+            i--
+          }
+        }
+      }
+      // Verify that the puzzle solves with negations applied
+      if (!_regionCheck(new_grid, new_region)) {
+        continue
+      }
+      // Verify that each negation is valid, i.e. removes an incorrect element
+      for (var negation of combination) {
+        new_grid[negation.target.x][negation.target.y] = negation.target.cell
+        new_region.push({'x': negation.target.x, 'y':negation.target.y})
+        var ret = _regionCheck(new_grid, new_region)
+        new_grid[negation.target.x][negation.target.y] = 0
+        new_region.pop()
+        if (ret) {
+          continue nextCombination
+        }
+      }
+      // console.log('Valid negation: ', combination)
+      return true
+    }
+    console.log('Unable to find valid negation but symbols exist')
+    return false
+  }
+
   // Count elements
   var squares = {}
   var polys = []
