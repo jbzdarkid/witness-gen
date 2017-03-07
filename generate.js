@@ -62,13 +62,18 @@ function _randomize(width, height) {
 
   for (var x=1; x<width; x+=2) {
     for (var y=1; y<height; y+=2) {
-      if (_randint(100) > 70) { // 70% empty space
-        var color = ['red', 'blue', 'green', 'orange'][Math.floor(Math.random()*2)]
+      var rand = _randint(100)
+      if (0 <= rand && rand < 25) { // Squares with 30%
+        var color = ['red', 'blue', 'green', 'orange'][_randint(3)]
         grid[x][y] = {'type':'square', 'color':color}
+      } else if (25 <= rand && rand < 35) { // Polys with 10%
+        var polys = Object.keys(POLY_DICT)
+        grid[x][y] = {'type':'poly', 'shape':polys[_randint(polys.length)]}
+      } else if (35 <= rand && rand < 40) { // Negation with 5%
+        grid[x][y] = {'type':'nega', 'color':'white'}
       }
     }
   }
-  grid[1][1] = {'type':'poly', 'shape':'2.0.0'}
   return {'grid':grid, 'start':start, 'end':end, 'dots':dots}
 }
 
