@@ -83,18 +83,32 @@ function draw(puzzle, target='puzzle') {
           }
         }
       } else if (puzzle.grid[x][y].type == 'square') {
-        var square = document.createElement('div')
-        square.className = 'square'
-        square.style.background = puzzle.grid[x][y].color
-        div.appendChild(square)
+        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', '0 0 50 50')
+        var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('transform', 'translate(12.5, 12.5)')
+        rect.style.height = '25px'
+        rect.style.width = '25px'
+        rect.style.rx = '5px'
+        rect.style.fill = puzzle.grid[x][y].color
+        svg.appendChild(rect)
+        div.appendChild(svg)
       } else if (puzzle.grid[x][y].type == 'poly') {
         // FIXME: Real polyominos, somehow
         div.innerHTML = puzzle.grid[x][y].shape
         div.style.color = 'white'
       } else if (puzzle.grid[x][y].type == 'nega') {
-        div.innerHTML = '\u2144'
-        div.style.color = puzzle.grid[x][y].color
-        div.style.fontSize = '24px'
+        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', '0 0 50 50')
+        for (var rot of [60, 180, 300]) {
+          var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+          rect.setAttribute('transform', 'translate(22, 27) rotate('+rot+', 3, 0)')
+          rect.style.height = '12px'
+          rect.style.width = '6px'
+          rect.style.fill = puzzle.grid[x][y].color
+          svg.appendChild(rect)
+        }
+        div.appendChild(svg)
       }
       cell.appendChild(div)
     }
