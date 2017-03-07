@@ -10,6 +10,14 @@ function newGrid(width, height) {
 }
 
 function test0() {
+  var grid = newGrid(3, 7)
+  grid[1][1] = {'type':'nega', 'color':'white'}
+  grid[1][3] = {'type':'square', 'color':'red'}
+  grid[1][5] = {'type':'square', 'color':'blue'}
+  return {'grid':grid, 'start':{'x':2, 'y':0}, 'end':{'x':2, 'y':6}, 'dots':[]}
+}
+
+function test1() {
   var grid = newGrid(7, 7)
   grid[1][5] = {'type':'nega', 'color':'white'}
   grid[5][5] = {'type':'nega', 'color':'white'}
@@ -19,7 +27,7 @@ function test0() {
   return {'grid':grid, 'start':{'x':6, 'y':0}, 'end':{'x':0, 'y':0}, 'dots':[]}
 }
 
-function test1() {
+function test2() {
   var grid = newGrid(7, 7)
   grid[1][1] = {'type':'nega', 'color':'white'}
   grid[1][3] = {'type':'nega', 'color':'white'}
@@ -29,7 +37,7 @@ function test1() {
   return {'grid':grid, 'start':{'x':6, 'y':0}, 'end':{'x':6, 'y':6}, 'dots':[]}
 }
 
-function test2() {
+function test3() {
   var grid = newGrid(7, 7)
   grid[1][1] = {'type':'nega', 'color':'white'}
   grid[1][3] = {'type':'nega', 'color':'white'}
@@ -37,14 +45,6 @@ function test2() {
   grid[3][3] = {'type':'square', 'color':'blue'}
   grid[3][5] = {'type':'square', 'color':'blue'}
   return {'grid':grid, 'start':{'x':6, 'y':0}, 'end':{'x':6, 'y':6}, 'dots':[{'x':2, 'y':2}]}
-}
-
-function test3() {
-  var grid = newGrid(3, 7)
-  grid[1][1] = {'type':'nega', 'color':'white'}
-  grid[1][3] = {'type':'square', 'color':'red'}
-  grid[1][5] = {'type':'square', 'color':'blue'}
-  return {'grid':grid, 'start':{'x':2, 'y':0}, 'end':{'x':2, 'y':6}, 'dots':[]}
 }
 
 function generatePuzzle() {
