@@ -78,7 +78,7 @@ var tests = [
   }
 ]
 
-function generatePuzzle() {
+function loadTests() {
   var start = (new Date()).getTime()
   for (var i=0; i<tests.length; i++) {
     try {
@@ -96,5 +96,5 @@ function generatePuzzle() {
     }
   }
   var end = (new Date()).getTime()
-  console.log(end - start, 'milliseconds')
+  document.getElementById('load').innerHTML = (end - start)/1000 + ' seconds'
 }
