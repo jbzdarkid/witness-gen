@@ -1,5 +1,3 @@
-// Provides the isValid() method for validating a puzzle solution.
-
 // Puzzle = {grid, start, end, dots}
 // Determines if the current grid state is solvable.
 // Returns 0 if the grid is potentially solvable, but not currently solved
@@ -87,55 +85,10 @@ function isValid(puzzle) {
   return 2
 }
 
-function _combinations(grid, region) {
-  var nega = 0
-  for (var i=0; i<region.length; i++) {
-    var pos = region[i]
-    var cell = grid[pos.x][pos.y]
-    if (cell != 0) {
-      if (cell.type == 'nega') {
-        nega = {'x':pos.x, 'y':pos.y, 'cell':cell, 'i':i}
-        break
-      }
-    }
-  }
-  if (nega == 0) {
-    return [[]]
-  } else {
-    region.splice(nega.i, 1)
-    grid[nega.x][nega.y] = 0
-    var combinations = []
-    // For each element in the region
-    for (var i=0; i<region.length; i++) {
-      var pos = region[i]
-      var cell = grid[pos.x][pos.y]
-      if (cell != 0) {
-        // Negate the item
-        grid[pos.x][pos.y] = 0
-        // Find all combinations of later items
-        var new_region = region.slice()
-        new_region.splice(i, 1)
-        for (var comb of _combinations(grid, new_region)) {
-          // Combine this negation with each later combination
-          combinations.push([{
-            'source':{'x':nega.x, 'y':nega.y, 'cell':nega.cell},
-            'target':{'x':pos.x, 'y':pos.y, 'cell':cell}
-          }].concat(comb))
-        }
-        // Undo the negation
-        grid[pos.x][pos.y] = cell
-      }
-    }
-    // Restore the negation element too
-    region.splice(nega.i, 0, {'x':nega.x, 'y':nega.y})
-    grid[nega.x][nega.y] = nega.cell
-    return combinations
-  }
-}
-
 // Checks if a region (series of cells) is valid.
 // Since the path must be complete at this point, returns only true or false
 function _regionCheck(grid, region) {
+  // FIXME: Handled by for loop?
   var hasNega = false
   for (var i=0; i<region.length; i++) {
     var pos = region[i]
@@ -175,7 +128,8 @@ function _regionCheck(grid, region) {
     return false
   }
 
-  // Count elements
+  // Collect elements
+  // FIXME: Collect colors separately?
   var squares = {}
   var polys = []
   for (var pos of region) {
@@ -196,6 +150,8 @@ function _regionCheck(grid, region) {
     return false
   }
 
+  // For polyominos, we construct a grid to place them on
+  // The grid is 1 inside the eregion, and undefined outside.
   if (polys.length > 0) {
     var first = {'x':grid.length-1, 'y':grid[grid.length-1].length}
     var new_grid = []
@@ -216,23 +172,72 @@ function _regionCheck(grid, region) {
   return true
 }
 
-// FIXME: Blue polys somehow
-function _polyFit(polys, grid, first) {
-  // All polys placed, if grid is full then polys fit.
-  if (polys.length == 0) {
-    for (var x=1; x<grid.length; x+=2) {
-      for (var y=1; y<grid.length; y+=2) {
-        if (grid[x][y] != undefined) {
-          console.log('All polys placed, but grid not full')
-          return false
-        }
+// Returns all the different ways to negate elements.
+// FIXME: Doesn't remove swaps, i.e. A->i B->j == A->j B->i
+function _combinations(grid, region) {
+  // Get the first negation symbol
+  var nega = undefined
+  for (var i=0; i<region.length; i++) {
+    var pos = region[i]
+    var cell = grid[pos.x][pos.y]
+    if (cell != 0) {
+      if (cell.type == 'nega') {
+        nega = {'x':pos.x, 'y':pos.y, 'cell':cell, 'i':i}
+        break
       }
     }
+  }
+  if (nega == undefined) {
+    return [[]]
+  } else {
+    // Remove it from the region so we don't try and use it
+    region.splice(nega.i, 1)
+    grid[nega.x][nega.y] = 0
+    var combinations = []
+    // For each element in the region
+    for (var i=0; i<region.length; i++) {
+      var pos = region[i]
+      var cell = grid[pos.x][pos.y]
+      if (cell != 0) {
+        // Negate the item
+        // FIXME: This is where duplication occurs. Rewrite & solve?
+        var new_region = region.slice()
+        new_region.splice(i, 1)
+        grid[pos.x][pos.y] = 0
+        // Find all combinations of later items
+        for (var comb of _combinations(grid, new_region)) {
+          // Combine this negation with each later combination
+          combinations.push([{
+            'source':{'x':nega.x, 'y':nega.y, 'cell':nega.cell},
+            'target':{'x':pos.x, 'y':pos.y, 'cell':cell}
+          }].concat(comb))
+        }
+        // Undo the negation
+        grid[pos.x][pos.y] = cell
+      }
+    }
+    // Restore the negation element too
+    region.splice(nega.i, 0, {'x':nega.x, 'y':nega.y})
+    grid[nega.x][nega.y] = nega.cell
+    return combinations
+  }
+}
+
+// Returns whether or not a set of polyominos fit into a region.
+// The region is represented on a grid to facilitate checking.
+// Solves via recursive backtracking: Some piece must fill the top left square,
+// so try every piece to fill it, then recurse.
+// Thus, it retains a pointer to the first free square.
+// FIXME: Think about how Blue polys are going to work. Probably best bet is to place them into the shape?
+function _polyFit(polys, grid, first) {
+  if (first == undefined && polys.length == 0) {
     console.log('All polys placed, and grid full')
     return true
-  }
-  if (first == undefined) {
+  } else if (first == undefined && polys.length > 0) {
     console.log('Polys remaining but grid full')
+    return false
+  } else if (first != undefined && polys.length == 0) {
+    console.log('All polys placed, but grid not full')
     return false
   }
   nextPoly: for (var i=0; i<polys.length; i++) {
@@ -241,11 +246,12 @@ function _polyFit(polys, grid, first) {
     var new_grid = _copyGrid(grid)
 
     for (var cell of polyCells) {
-      if (new_grid[cell.x+first.x] != undefined && new_grid[cell.x+first.x][cell.y+first.y] != undefined) {
-        new_grid[cell.x+first.x][cell.y+first.y] = undefined
-      } else { // Poly didn't fit, restore the list and try the next one
+      // Check if the poly is off the grid or extends out of region
+      if (new_grid[cell.x+first.x] == undefined || new_grid[cell.x+first.x][cell.y+first.y] == undefined) {
         polys.splice(i, 0, poly)
-        continue nextPoly
+        continue nextPoly // Poly didn't fit, restore the list and try again
+      } else {
+        new_grid[cell.x+first.x][cell.y+first.y] = undefined
       }
     }
 
@@ -265,5 +271,5 @@ function _polyFit(polys, grid, first) {
     // Restore list for the next poly choice
     polys.splice(i, 0, poly)
   }
-  return false
+  return false // Tail recursion
 }
