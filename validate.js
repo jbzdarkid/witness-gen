@@ -151,33 +151,19 @@ function _regionCheck(grid, region) {
     nextCombination: for (var combination of combinations) {
       // Make a copy of the grid and region with negation elements removed
       var new_grid = _copyGrid(grid)
-      var new_region = region.slice()
       for (var negation of combination) {
         new_grid[negation.source.x][negation.source.y] = 0
         new_grid[negation.target.x][negation.target.y] = 0
-        for (var i=0; i<new_region.length; i++) {
-          if (new_region[i].x == negation.source.x &&
-              new_region[i].y == negation.source.y) {
-            new_region.splice(i, 1)
-            i--
-          } else if (new_region[i].x == negation.target.x &&
-              new_region[i].y == negation.target.y) {
-            new_region.splice(i, 1)
-            i--
-          }
-        }
       }
       // Verify that the puzzle solves with negations applied
-      if (!_regionCheck(new_grid, new_region)) {
+      if (!_regionCheck(new_grid, region)) {
         continue
       }
       // Verify that each negation is valid, i.e. removes an incorrect element
       for (var negation of combination) {
         new_grid[negation.target.x][negation.target.y] = negation.target.cell
-        new_region.push({'x': negation.target.x, 'y':negation.target.y})
-        var ret = _regionCheck(new_grid, new_region)
+        var ret = _regionCheck(new_grid, region)
         new_grid[negation.target.x][negation.target.y] = 0
-        new_region.pop()
         if (ret) {
           continue nextCombination
         }
