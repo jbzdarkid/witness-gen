@@ -68,7 +68,7 @@ function _randomize(width, height) {
         grid[x][y] = {'type':'square', 'color':color}
       } else if (25 <= rand && rand < 35) { // Polys with 10%
         var polys = Object.keys(POLY_DICT)
-        grid[x][y] = {'type':'poly', 'shape':polys[_randint(polys.length)]}
+        grid[x][y] = {'type':'poly', 'shape':polys[_randint(polys.length)], 'color':'yellow'}
       } else if (35 <= rand && rand < 40) { // Negation with 5%
         grid[x][y] = {'type':'nega', 'color':'white'}
       }
