@@ -56,19 +56,16 @@ function test4() {
 
 function test5() {
   var grid = newGrid(7, 7)
-  // grid[1][1] = {'type':'poly', 'shape':'1.0.0', 'color':'yellow'}
-  // grid[1][3] = {'type':'poly', 'shape':'2.0.0', 'color':'yellow'}
-  // grid[1][5] = {'type':'poly', 'shape':'3.0.0', 'color':'yellow'}
+  grid[1][5] = {'type':'poly', 'shape':'3.0.0', 'color':'yellow'}
   grid[3][3] = {'type':'poly', 'shape':'3.1.1', 'color':'yellow'}
   return {'grid':grid, 'start':{'x':6, 'y':0}, 'end':{'x':6, 'y':6}, 'dots':[]}
 }
 
 function test6() {
   var grid = newGrid(7, 7)
-  // grid[1][1] = {'type':'poly', 'shape':'1.0.0', 'color':'yellow'}
-  // grid[1][3] = {'type':'poly', 'shape':'2.0.0', 'color':'yellow'}
-  // grid[1][5] = {'type':'poly', 'shape':'3.0.0', 'color':'yellow'}
-  grid[1][1] = {'type':'poly', 'shape':'3.1.3', 'color':'yellow'}
+  grid[1][1] = {'type':'nega', 'color':'white'}
+  grid[1][3] = {'type':'poly', 'shape':'3.1.2', 'color':'yellow'}
+  grid[3][1] = {'type':'poly', 'shape':'3.1.3', 'color':'yellow'}
   return {'grid':grid, 'start':{'x':6, 'y':0}, 'end':{'x':6, 'y':6}, 'dots':[]}
 }
 
