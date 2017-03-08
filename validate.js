@@ -87,68 +87,6 @@ function isValid(puzzle) {
   return 2
 }
 
-// Returns the contiguous regions on the grid, as arrays of points.
-// The return array may contain empty cells.
-function _getRegions(grid) {
-  var colors = []
-  for (var x=0; x<grid.length; x++) {
-    colors[x] = []
-    for (var y=0; y<grid[x].length; y++) {
-      colors[x][y] = 0
-    }
-  }
-
-  var regions = []
-  var unvisited = [{'x':1, 'y':1}]
-  var localRegion = []
-
-  while (unvisited.length > 0) {
-    regions[regions.length] = []
-    localRegion.push(unvisited.pop())
-    while (localRegion.length > 0) {
-      var cell = localRegion.pop()
-      if (colors[cell.x][cell.y] != 0) {
-        continue
-      } else {
-        colors[cell.x][cell.y] = regions.length
-        regions[regions.length-1].push(cell)
-      }
-      if (cell.x < colors.length-2 && colors[cell.x+2][cell.y] == 0) {
-        if (grid[cell.x+1][cell.y] == 0) {
-          localRegion.push({'x':cell.x+2, 'y':cell.y})
-        } else {
-          unvisited.push({'x':cell.x+2, 'y':cell.y})
-        }
-      }
-      if (cell.y < colors[cell.x].length-2 && colors[cell.x][cell.y+2] == 0) {
-        if (grid[cell.x][cell.y+1] == 0) {
-          localRegion.push({'x':cell.x, 'y':cell.y+2})
-        } else {
-          unvisited.push({'x':cell.x, 'y':cell.y+2})
-        }
-      }
-      if (cell.x > 1 && colors[cell.x-2][cell.y] == 0) {
-        if (grid[cell.x-1][cell.y] == 0) {
-          localRegion.push({'x':cell.x-2, 'y':cell.y})
-        } else {
-          unvisited.push({'x':cell.x-2, 'y':cell.y})
-        }
-      }
-      if (cell.y > 1 && colors[cell.x][cell.y-2] == 0) {
-        if (grid[cell.x][cell.y-1] == 0) {
-          localRegion.push({'x':cell.x, 'y':cell.y-2})
-        } else {
-          unvisited.push({'x':cell.x, 'y':cell.y-2})
-        }
-      }
-    }
-  }
-
-  // console.log('Computed region map, colors:')
-  // console.log(colors)
-  return regions
-}
-
 function _combinations(grid, region) {
   var nega = 0
   for (var i=0; i<region.length; i++) {
@@ -193,15 +131,6 @@ function _combinations(grid, region) {
     grid[nega.x][nega.y] = nega.cell
     return combinations
   }
-}
-
-// Makes a copy of the grid, since javascript is pass-by-reference
-function _copyGrid(grid) {
-  var new_grid = []
-  for (var row of grid) {
-    new_grid.push(row.slice())
-  }
-  return new_grid
 }
 
 // Checks if a region (series of cells) is valid.
@@ -301,18 +230,6 @@ function _regionCheck(grid, region) {
   return true
 }
 
-var POLY_DICT = {
-  '1.0.0': [{'x':0, 'y':0}],
-  '2.0.0': [{'x':0, 'y':0}, {'x':0, 'y':2}],
-  '2.0.1': [{'x':0, 'y':0}, {'x':2, 'y':0}],
-  '3.0.0': [{'x':0, 'y':0}, {'x':0, 'y':2}, {'x':0, 'y':4}],
-  '3.0.1': [{'x':0, 'y':0}, {'x':2, 'y':0}, {'x':4, 'y':0}],
-  '3.1.0': [{'x':0, 'y':0}, {'x':0, 'y':2}, {'x':2, 'y':2}],
-  '3.1.1': [{'x':0, 'y':0}, {'x':2, 'y':0}, {'x':2, 'y':-2}],
-  '3.1.2': [{'x':0, 'y':0}, {'x':2, 'y':0}, {'x':2, 'y':2}],
-  '3.1.3': [{'x':0, 'y':0}, {'x':0, 'y':2}, {'x':2, 'y':0}],
-}
-
 // FIXME: Blue polys somehow
 function _polyFit(polys, grid, first) {
   // All polys placed, if grid is full then polys fit.
@@ -338,7 +255,7 @@ function _polyFit(polys, grid, first) {
     var new_grid = _copyGrid(grid)
 
     for (var cell of polyCells) {
-      if (new_grid[cell.x+first.x][cell.y+first.y] != undefined) {
+      if (new_grid[cell.x+first.x] != undefined && new_grid[cell.x+first.x][cell.y+first.y] != undefined) {
         new_grid[cell.x+first.x][cell.y+first.y] = undefined
       } else { // Poly didn't fit, restore the list and try the next one
         polys.splice(i, 0, poly)
