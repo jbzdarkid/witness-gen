@@ -99,7 +99,7 @@ function generatePuzzle(width, height) {
   while (true) {
     solutions = []
     var puzzle = _randomize(width, height)
-    solve(puzzle, puzzle.start, solutions, [false])
+    solve(puzzle, puzzle.start, solutions)
     if (solutions.length == 0) {
       continue
     } else if (solutions.length == 1) {
@@ -108,5 +108,6 @@ function generatePuzzle(width, height) {
       break // Multiple solutions, force only one via dots & breaks
     }
   }
+  // draw(puzzle)
   draw(solutions[0])
 }
