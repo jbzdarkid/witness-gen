@@ -10,7 +10,7 @@ function _copyGrid(grid) {
 // Returns a new copy of a puzzle, since javascript is pass-by-reference.
 function _copy(puzzle) {
   return {
-    'grid':_copyGrid(grid),
+    'grid':_copyGrid(puzzle.grid),
     'start':{'x':puzzle.start.x, 'y':puzzle.start.y},
     'end':{'x':puzzle.end.x, 'y':puzzle.end.y},
     'dots':puzzle.dots.slice()
