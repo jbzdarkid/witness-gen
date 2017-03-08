@@ -93,6 +93,19 @@ function draw(puzzle, target='puzzle') {
         rect.style.fill = puzzle.grid[x][y].color
         svg.appendChild(rect)
         div.appendChild(svg)
+      } else if (puzzle.grid[x][y].type == 'star') {
+        // FIXME: Stars are actually canted in slightly
+        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', '0 0 50 50')
+        for (var rot of [0, 45]) {
+          var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          rect.setAttribute('transform', 'translate(15, 15) rotate('+rot+', 10, 10)')
+          rect.style.height = '20px'
+          rect.style.width = '20px'
+          rect.style.fill = puzzle.grid[x][y].color
+          svg.appendChild(rect)
+        }
+        div.appendChild(svg)
       } else if (puzzle.grid[x][y].type == 'poly') {
         var bounds = {'xmin':0, 'xmax':0, 'ymin':0, 'ymax':0}
         for (var pos of POLY_DICT[puzzle.grid[x][y].shape]) {
@@ -101,7 +114,6 @@ function draw(puzzle, target='puzzle') {
           bounds.ymin = Math.min(bounds.ymin, pos.y)
           bounds.ymax = Math.max(bounds.ymax, pos.y)
         }
-
         var xoffset = 20 - 3.5 * (bounds.xmax + bounds.xmin)
         var yoffset = 20 - 3.5 * (bounds.ymax + bounds.ymin)
 
