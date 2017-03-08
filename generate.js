@@ -62,17 +62,20 @@ function _randomize(width, height) {
 
   var distribution = {
     'square': 30,
+    'star': 10,
     'poly': 10,
-    'nega': 3
+    'nega': 3,
   }
   function _randObject(type) {
     var obj = {'type':type}
     if (type == 'square') {
-      obj.color = ['red', 'blue', 'green', 'orange'][_randint(3)]
+      obj.color = ['red', 'blue', 'green', 'orange'][_randint(4)]
+    } else if (type == 'star') {
+      obj.color = ['red', 'blue', 'green', 'orange'][_randint(2)]
     } else if (type == 'poly') {
       var polys = Object.keys(POLY_DICT)
       obj.shape = polys[_randint(polys.length)]
-      obj.color = 'yellow'
+      obj.color = ['yellow', 'yellow', 'red', 'blue'][_randint(4)]
     } else if (type == 'nega') {
       obj.color = 'white'
     }

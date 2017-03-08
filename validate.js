@@ -128,30 +128,54 @@ function _regionCheck(grid, region) {
     return false
   }
 
-  // Collect elements
-  // FIXME: Collect colors separately?
-  var squares = {}
-  var polys = []
+  // Check for color-based elements
+  var colors = {}
   for (var pos of region) {
     var cell = grid[pos.x][pos.y]
     if (cell != 0) {
+      if (colors[cell.color] == undefined) {
+        colors[cell.color] = {'squares':0, 'stars':0, 'other':0}
+      }
       if (cell.type == 'square') {
-        if (squares[cell.color] === undefined) {
-          squares[cell.color] = 0
-        }
-        squares[cell.color]++
-      } else if (cell.type == 'poly') {
-        polys.push(cell.shape)
+        colors[cell.color]['squares']++
+      } else if (cell.type == 'star') {
+        colors[cell.color]['stars']++
+      } else if (cell.type == 'poly' || cell.type == 'nega') {
+        colors[cell.color]['other']++
       }
     }
   }
-  if (Object.keys(squares).length > 1) {
-    console.log('Region has squares of different colors', squares)
-    return false
+
+  var colorKeys = Object.keys(colors)
+  for (var i=0; i<colorKeys.length; i++) {
+    var objects = colors[colorKeys[i]]
+    if (objects['squares'] > 0) {
+      // Squares can only be in a region with same colored squares
+      for (var j=i+1; j<colorKeys.length; j++) {
+        if (colors[colorKeys[j]]['squares'] > 0) {
+          console.log('Found a '+colorKeys[i]+' and '+colorKeys[j]+' square in the same region')
+          return false
+        }
+      }
+    } else if (objects['stars'] > 0) {
+      // Stars must be in a region with exactly one other element of their color
+      var count = objects['squares']+objects['stars']+objects['other']
+      if (count != 2) {
+        console.log('Found a '+colorKeys[i]+' star in a region with '+count+' total '+colorKeys[i]+' objects')
+        return false
+      }
+    }
   }
 
   // For polyominos, we construct a grid to place them on
-  // The grid is 1 inside the eregion, and undefined outside.
+  // The grid is 1 inside the region, and undefined outside.
+  var polys = []
+  for (var pos of region) {
+    var cell = grid[pos.x][pos.y]
+    if (cell != 0 && cell.type == 'poly') {
+      polys.push(cell.shape)
+    }
+  }
   if (polys.length > 0) {
     var first = {'x':grid.length-1, 'y':grid[grid.length-1].length}
     var new_grid = []
