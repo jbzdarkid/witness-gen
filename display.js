@@ -52,6 +52,7 @@ function draw(puzzle, target='puzzle') {
       }
       if (x == puzzle.start.x && y == puzzle.start.y) {
         div.className = 'start line'
+        div.onclick = function() {trace(this)}
       } else if (x == puzzle.end.x && y == puzzle.end.y) {
         if (y == 0) {
           div.className = 'end end-left line'
