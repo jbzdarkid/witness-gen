@@ -60,17 +60,34 @@ function _randomize(width, height) {
     }
   }
 
+  var distribution = {
+    'square': 30,
+    'poly': 10,
+    'nega': 3
+  }
+  function _randObject(type) {
+    var obj = {'type':type}
+    if (type == 'square') {
+      obj.color = ['red', 'blue', 'green', 'orange'][_randint(3)]
+    } else if (type == 'poly') {
+      var polys = Object.keys(POLY_DICT)
+      obj.shape = polys[_randint(polys.length)]
+      obj.color = 'yellow'
+    } else if (type == 'nega') {
+      obj.color = 'white'
+    }
+    return obj
+  }
+
   for (var x=1; x<width; x+=2) {
     for (var y=1; y<height; y+=2) {
       var rand = _randint(100)
-      if (0 <= rand && rand < 25) { // Squares with 30%
-        var color = ['red', 'blue', 'green', 'orange'][_randint(3)]
-        grid[x][y] = {'type':'square', 'color':color}
-      } else if (25 <= rand && rand < 35) { // Polys with 10%
-        var polys = Object.keys(POLY_DICT)
-        grid[x][y] = {'type':'poly', 'shape':polys[_randint(polys.length)], 'color':'yellow'}
-      } else if (35 <= rand && rand < 40) { // Negation with 5%
-        grid[x][y] = {'type':'nega', 'color':'white'}
+      for (var type in distribution) {
+        if (rand < distribution[type]) {
+          grid[x][y] = _randObject(type)
+          break
+        }
+        rand -= distribution[type]
       }
     }
   }
