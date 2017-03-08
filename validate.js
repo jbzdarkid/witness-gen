@@ -157,7 +157,8 @@ function _regionCheck(grid, region) {
           return false
         }
       }
-    } else if (objects['stars'] > 0) {
+    }
+    if (objects['stars'] > 0) {
       // Stars must be in a region with exactly one other element of their color
       var count = objects['squares']+objects['stars']+objects['other']
       if (count != 2) {
