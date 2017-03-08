@@ -75,6 +75,11 @@ var tests = [
     grid[1][1] = {'type':'star', 'color':'red'}
     grid[1][3] = {'type':'poly', 'shape':'2.0.0', 'color':'red'}
     return {'grid':grid,'start':{'x':0,'y':0},'end':{'x':4,'y':4},'dots':[]}
+  }, function() {
+    var grid = newGrid(5, 7)
+    grid[1][1] = {'type':'poly', 'shape':'3.0.0', 'color':'yellow'}
+    grid[3][1] = {'type':'poly', 'shape':'3.0.0', 'color':'yellow'}
+    return {'grid':grid,'start':{'x':2,'y':2},'end':{'x':0,'y':6},'dots':[]}
   }
 ]
 
