@@ -148,7 +148,19 @@ function draw(puzzle, target='puzzle') {
   for (var dot of puzzle.dots) {
     var cell = document.getElementById(target+'_'+dot.x+'_'+dot.y)
     var div = cell.childNodes[0]
-    div.innerHTML = '\u2b22'
-    div.style.fontSize = '16px'
+
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 50 50')
+    svg.style.width = '20px'
+    svg.style.height = '20px'
+    var hex = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    hex.setAttribute('points', '11 19, 22 0, 11 -19, -11 -19, -22 0, -11 19')
+    // hex.setAttribute('points', '11 19, 22 0, 11 -19, -11 -19, -22 0, -11 19')
+    hex.setAttribute('transform', 'translate(25, 25)')
+    hex.style.color = 'black'
+    svg.appendChild(hex)
+    div.appendChild(svg)
+    // div.innerHTML = '\u2b22'
+    // div.style.fontSize = '16px'
   }
 }
