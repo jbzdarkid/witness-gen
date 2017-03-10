@@ -12,8 +12,11 @@
  **/
 
 // Returns a random integer in [0, n)
+// Uses a set seed so puzzles can be regenerated
+var seed = 42
 function _randint(n) {
-  return Math.floor(Math.random()*n)
+  seed = ((seed << 13) ^ seed) - (seed >> 21)
+  return Math.abs(seed) % Math.floor(n)
 }
 
 // Generates a random puzzle for a given size.
@@ -97,10 +100,21 @@ function _randomize(width, height) {
   return {'grid':grid, 'start':start, 'end':end, 'dots':dots}
 }
 
+// When the page is done loading, generate a puzzle
+window.onload = function () {
+  document.getElementById('generate').onclick()
+}
+
 function generatePuzzle(width, height) {
+  if (location.hash != '') {
+    seed = parseInt(location.hash.substring(1))
+  } else {
+    seed = Math.floor(Math.random() * (1 << 30))
+  }
   var solutions
   while (true) {
     solutions = []
+    var puzzleSeed = seed
     var puzzle = _randomize(width, height)
     solve(puzzle, puzzle.start, solutions)
     if (solutions.length == 0) {
@@ -111,6 +125,7 @@ function generatePuzzle(width, height) {
       break // Multiple solutions, force only one via dots & breaks
     }
   }
+  document.getElementById('generate').innerHTML = 'Seed: '+puzzleSeed
   // draw(puzzle)
   draw(solutions[0])
 }
